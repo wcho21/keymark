@@ -25,3 +25,25 @@ const updateSource = debounce((e) => {
     </div>
   </div>
 </template>
+
+<style lang="postcss" scoped>
+.preview-component >>> h1 {
+  @apply font-bold text-3xl;
+}
+
+.preview-component >>> h2 {
+  @apply font-bold text-2xl;
+}
+
+.preview-component >>> h3 {
+  @apply font-bold text-xl;
+}
+
+.preview-component >>> h4 {
+  @apply font-bold text-lg;
+}
+
+.preview-component >>> h5 {
+  @apply font-bold;
+}
+</style>
