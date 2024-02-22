@@ -1,7 +1,27 @@
 <script lang="ts" setup>
 import { marked } from "marked";
-import { debounce } from "lodash-es";
+import type { HooksObject } from "marked";
+import { debounce, range } from "lodash-es";
 import { ref, computed } from "vue";
+
+const slideBeg = "<div class=\"markdown-slide\">";
+const slideEnd = "</div>";
+
+const slidify = (regex: RegExp, source: string) => {
+  const begs = [0, ...Array.from(source.matchAll(regex)).map(match => match.index), source.length-1];
+  const sliced = range(begs.length-1).map(i => source.slice(begs[i], begs[i+1]));
+  return slideBeg + sliced.join(slideEnd + slideBeg) + slideEnd;
+};
+
+const hooks: HooksObject = {
+  postprocess(markdown) {
+    const h2Slides = slidify(/(\<h1\>|\<h2\>)/g, markdown);
+    console.log(h2Slides);
+
+    return h2Slides;
+  },
+}
+marked.use({ hooks });
 
 const markdownSource = ref<string>("");
 const parsed = computed(() => marked(markdownSource.value));
@@ -27,23 +47,27 @@ const updateSource = debounce((e) => {
 </template>
 
 <style lang="postcss" scoped>
-.preview-component >>> h1 {
+.preview-component :deep(h1) {
   @apply font-bold text-3xl;
 }
 
-.preview-component >>> h2 {
+.preview-component :deep(h2) {
   @apply font-bold text-2xl;
 }
 
-.preview-component >>> h3 {
+.preview-component :deep(h3) {
   @apply font-bold text-xl;
 }
 
-.preview-component >>> h4 {
+.preview-component :deep(h4) {
   @apply font-bold text-lg;
 }
 
-.preview-component >>> h5 {
+.preview-component :deep(h5) {
   @apply font-bold;
+}
+
+.preview-component :deep(.markdown-slide) {
+  @apply border;
 }
 </style>
